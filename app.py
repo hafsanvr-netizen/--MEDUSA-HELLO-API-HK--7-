@@ -24,9 +24,9 @@ WRONG_KEY_RESPONSE = {
 }
 # -------------------------------
 
-LIKES_PER_TOKEN_PER_DAY = 30          # ← প্রতি guest id দিনে ৩০ বার লাইক
+LIKES_PER_TOKEN_PER_DAY = 35          # ← প্রতি guest id দিনে ৩৫ বার লাইক
 LIKES_PER_USER_REQUEST = 700          # প্রতি user request এ target (capacity সাপেক্ষে সীমিত)
-TOKEN_FILE = "token_bd.json"          # ১১০টি guest id
+TOKEN_FILE = "token_bd.json"          # ২২০টি guest id
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -199,7 +199,7 @@ def get_like_api_url(server_name):
 
 
 def select_tokens_for_likes(all_tokens, required_count, state):
-    """প্রয়োজনীয় সংখ্যক টোকেন বাছাই করে যেগুলোর দৈনিক লিমিট (৩০/দিন) বাকি আছে।"""
+    """প্রয়োজনীয় সংখ্যক টোকেন বাছাই করে যেগুলোর দৈনিক লিমিট (৩৫/দিন) বাকি আছে।"""
     usage = state["usage"]
     selected = []
     for token_dict in all_tokens:
@@ -234,9 +234,9 @@ def home():
             "/token_info": "?key=YOUR_KEY"
         },
         "config": {
-            "tokens": "110 guest IDs",
+            "tokens": "220 guest IDs",
             "likes_per_token_per_day": LIKES_PER_TOKEN_PER_DAY,
-            "daily_capacity": 110 * LIKES_PER_TOKEN_PER_DAY
+            "daily_capacity": 220 * LIKES_PER_TOKEN_PER_DAY
         },
         "credits": "@HAFSAN_KUN"
     })
@@ -273,9 +273,8 @@ def handle_requests():
     before_likes = int(before_info.AccountInfo.Likes) if (before_info and hasattr(before_info, 'AccountInfo')) else 0
     print(f"UID {uid_param}: before = {before_likes}")
 
-    # প্রতিটি টোকেন এখন দিনে ৩০ বার লাইক দিতে পারে
-    # তাই ২২০+ এর জন্য এখন ২২০টি টোকেন লাগবে, কিন্তু আমাদের আছে ১১০টি
-    # কাজেই capacity অনুযায়ী টোকেন বাছাই করবো
+    # প্রতিটি টোকেন এখন দিনে ৩৫ বার লাইক দিতে পারে
+    # ২২০টি টোকেন থাকায় capacity অনেক বেশি
     with state_lock:
         state = load_state()
         selected = select_tokens_for_likes(all_tokens, LIKES_PER_USER_REQUEST, state)
@@ -288,7 +287,7 @@ def handle_requests():
             "PlayerNickname": "N/A",
             "UID": int(uid_param),
             "status": 2,
-            "message": "All tokens reached daily limit (30/token/day). Try again tomorrow (UTC).",
+            "message": "All tokens reached daily limit (35/token/day). Try again tomorrow (UTC).",
             "credits": "@HAFSAN_KUN"
         })
 
